@@ -1,9 +1,12 @@
 import React, { useState } from 'react'
 import NavBar from './NavBar'
-import { Link } from 'react-router-dom'
+import { Link,useNavigate } from 'react-router-dom'
 import { KeyRound, Mail, Eye, EyeOff } from 'lucide-react'
+import { useAuth } from './AuthContext'
 
-const SignIn= () => {
+const SignIn = () => {
+  const navigate = useNavigate();
+  const { login } = useAuth();
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [errors, setErrors] = useState({ email: '', password: '' });
   const [showPassword, setShowPassword] = useState(false);
@@ -17,7 +20,7 @@ const SignIn= () => {
     setSuccess('');
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     let newErrors = {};
     if (!formData.email) newErrors.email = 'Please enter your email';
@@ -29,7 +32,17 @@ const SignIn= () => {
     }
 
     // Placeholder success behaviour - replace with real auth call
-    setSuccess('Signed in successfully');
+     try {
+      const { ok, data } = await login(formData.email, formData.password);
+      if (!ok) {
+        setError(data?.message || "Login failed");
+        return;
+      }
+      setSuccess("Signed in successfully");
+      navigate("/home");
+    } catch {
+      setError("Cannot connect to backend.");
+    }
   };
 
   const toggleShowPassword = () => setShowPassword((p) => !p);
@@ -50,9 +63,9 @@ const SignIn= () => {
                 onChange={handleChange}
                 className='border-1 border-gray-300 bg-gray-50 w-full  rounded-md py-3 px-12 focus:outline-none focus:border-black focus:border-1.8 text-sm duration-200'
                 type='text'
-                placeholder='sample123@gmail.com'
+                placeholder='sample123'
               />
-              <Mail className='absolute top-3 w-5 h-5 left-3 text-gray-400' />
+              <Mail className='absolute top-3 w-5 h-5 left-3 text-blue-400' />
             </div>
             {errors.email && <p className='text-red-500 text-sm mt-1'>{errors.email}</p>}
 
@@ -68,7 +81,7 @@ const SignIn= () => {
                 type={showPassword ? 'text' : 'password'}
                 placeholder='sample123'
               />
-              <KeyRound className='absolute top-3 w-5 h-5 left-3 text-gray-400' />
+              <KeyRound className='absolute top-3 w-5 h-5 left-3 text-red-400' />
               <button type='button' onClick={toggleShowPassword} className='absolute right-3 top-2.5'>
                 {showPassword ? <Eye className='w-5 h-5' /> : <EyeOff className='w-5 h-5' />}
               </button>
@@ -96,4 +109,4 @@ const SignIn= () => {
   )
 }
 
-export default SignIn
+export default SignIn;
