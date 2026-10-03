@@ -4,14 +4,27 @@
 import NavBar from "./NavBar";
 import { useAuth } from "./AuthContext";
 import { Link } from "react-router-dom";
+import {getPostById, getPosts} from "./core/post";
+import {useEffect,useState} from "react";//useState-store and update data,useEffect-synchronize with something outside React
 
 // numbers.map((num)=>(html))
 
 function Home() {
 
     const {user}= useAuth();
+    const [posts,setPosts]=useState([]);
 
-    const posts = [{
+    const [error,setError]=useState("");
+    useEffect(()=>{
+        getPosts().then((data)=>{
+            if(!Array.isArray(data)) setError("Could not load posts");
+                else setPosts(data);
+        });
+    },[]);
+  
+
+
+    const post = [{
         id: 1,
         title: "Getting Started with React and Tailwind CSS",
         author: "Prem Sagar",

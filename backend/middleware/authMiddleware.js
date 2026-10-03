@@ -4,7 +4,7 @@ const JWT_SECRET = process.env.JWT_SECRET || "teaching-secret";
 
 const authenticate = (req, res, next) => {
 
-    const token = req.cookies.mytoken;
+    const token = req.cookies.token;
 
     if (!token) {
         return res.status(401).json({

@@ -1,7 +1,19 @@
 const Post = require('../models/Post.js');
+const User = require('../models/user.js');
 const createPost = async (req, res) => {
     try {
-        const post = await Post.create(req.body);
+        const user = await User.findById(req.user.userId).select('fullName');
+        if (!user) {
+            return res.status(404).json({
+                message: "User not found"
+            });
+        }
+
+        const post = await Post.create({
+            ...req.body,
+            author: user.fullName,
+            authorId: user._id
+        });
         res.status(201).json({
             message: "Post Created Successfully",
             post
@@ -32,7 +44,7 @@ const getPosts = async (req, res) => {
 };
 const getPostById = async (req, res) => {
     try {
-        const post = await post.getPostById(req.params.id);
+        const post = await Post.getPostById(req.params.id);
         if (!post) {
             return res.status(404).json({
                 message: "Post not found"

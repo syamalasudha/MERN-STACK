@@ -1,9 +1,18 @@
-import { Link, useLocation } from "react-router-dom";
+import { data, Link, useLocation, useParams } from "react-router-dom";
 import NavBar from "./NavBar";
+import { useState } from "react";
+import { getPostById } from "./core/post";
 
 export default function PostDetails() {
   const { state } = useLocation();
-  const post = state?.post;
+  const {id} = useParams();
+  const {post,setPost} = useState(state?.post??null)
+  useEffect(()=>{
+    if(!post && id){
+      getPostById(id).then((data)=>setPost(data?._id?data:null))
+    }
+  },[id,post])
+  
 
   return <div className="min-h-screen bg-gray-50"><NavBar />
     <main className="mx-auto mt-8 max-w-3xl px-4 pb-10">
